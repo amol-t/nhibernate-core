@@ -16,19 +16,24 @@ namespace NHibernate.Test.NHSpecificTest.NH1693
 
 		protected override void OnSetUp()
 		{
+			Assert.That(System.Transactions.Transaction.Current, Is.Null);
 			using (var session = OpenSession())
-			using (var tx = session.BeginTransaction())
 			{
-				session.Save(new Invoice { Mode = "a", Num = 1, Category = 10 });
-				session.Save(new Invoice { Mode = "a", Num = 2, Category = 10 });
-				session.Save(new Invoice { Mode = "a", Num = 3, Category = 20 });
-				session.Save(new Invoice { Mode = "a", Num = 4, Category = 10 });
-				session.Save(new Invoice { Mode = "b", Num = 2, Category = 10 });
-				session.Save(new Invoice { Mode = "b", Num = 3, Category = 10 });
-				session.Save(new Invoice { Mode = "b", Num = 5, Category = 10 });
+				Assert.That(System.Transactions.Transaction.Current, Is.Null);
+				using (var tx = session.BeginTransaction())
+				{
+					Assert.That(System.Transactions.Transaction.Current, Is.Null);
+					session.Save(new Invoice { Mode = "a", Num = 1, Category = 10 });
+					session.Save(new Invoice { Mode = "a", Num = 2, Category = 10 });
+					session.Save(new Invoice { Mode = "a", Num = 3, Category = 20 });
+					session.Save(new Invoice { Mode = "a", Num = 4, Category = 10 });
+					session.Save(new Invoice { Mode = "b", Num = 2, Category = 10 });
+					session.Save(new Invoice { Mode = "b", Num = 3, Category = 10 });
+					session.Save(new Invoice { Mode = "b", Num = 5, Category = 10 });
 
-				tx.Commit();
-			}
+					tx.Commit();
+				}
+			}			
 		}
 
 		[Test]
